@@ -8,6 +8,14 @@ const schema = new mongoose.Schema({
   verified: { type: Boolean, required: true, default: false },
 }, { timestamps: true });
 
+// Removes sensitive data during serialization
+schema.methods.toJSON = function () {
+  const userObject = this.toObject();
+  delete userObject.email;
+  delete userObject.password;
+  return userObject;
+};
+
 const User = mongoose.model('User', schema);
 
 module.exports = User;

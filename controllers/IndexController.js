@@ -14,7 +14,8 @@ const index = async (req, res) => {
 const test = async (req, res) => {
   try {
     return res.status(200).json({
-      message: 'Welcome to our blog - TEST.'
+      message: 'Welcome to our blog - TEST.',
+      user: req.user
     });
   } catch (error) {
     console.error(error);
