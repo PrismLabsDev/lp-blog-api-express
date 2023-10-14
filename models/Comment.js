@@ -7,6 +7,12 @@ const schema = new mongoose.Schema({
   body: { type: String, required: true },
 }, { timestamps: true });
 
+schema.methods.toJSON = function () {
+  const schemaObject = this.toObject();
+  schemaObject.id = schemaObject._id;
+  return schemaObject;
+};
+
 const Comment = mongoose.model('Comment', schema);
 
 module.exports = Comment;

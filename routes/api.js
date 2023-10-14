@@ -29,13 +29,13 @@ router.delete('/user/:id/follow', auth, UserController.unfollow);
 
 // Article
 router.get('/article', auth, ArticleController.index);
-router.get('/article/:id', auth, ArticleController.show);
+router.get('/article/:slug', auth, ArticleController.show);
 router.post('/article', auth, ArticleController.create);
-router.patch('/article/:id', auth, ArticleController.update);
-router.delete('/article/:id', auth, ArticleController.destroy);
-router.post('/article/:id/comment', auth, ArticleController.comment);
-router.post('/article/:id/like', auth, ArticleController.like);
-router.delete('/article/:id/like', auth, ArticleController.unlike);
+router.patch('/article/:slug', auth, ArticleController.update);
+router.delete('/article/:slug', auth, ArticleController.destroy);
+router.post('/article/:slug/comment', auth, ArticleController.comment);
+router.post('/article/:slug/like', auth, ArticleController.like);
+router.delete('/article/:slug/like', auth, ArticleController.unlike);
 
 // Comments
 router.get('/comment/:id', auth, CommentController.show);

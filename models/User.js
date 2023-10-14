@@ -11,6 +11,7 @@ const schema = new mongoose.Schema({
 // Removes sensitive data during serialization
 schema.methods.toJSON = function () {
   const userObject = this.toObject();
+  userObject.id = userObject._id;
   delete userObject.email;
   delete userObject.password;
   return userObject;
