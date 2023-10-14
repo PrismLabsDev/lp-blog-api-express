@@ -79,7 +79,7 @@ const update = async (req, res) => {
 const follow = async (req, res) => {
 
   try {
-    const alreadyFollowing = await UserFollowing.findOne().where({user_id: req.user._id}).where({following_user_id: req.params.id}).exec();
+    const alreadyFollowing = await UserFollowing.findOne().where({user: req.user._id}).where({following_user: req.params.id}).exec();
 
     if(alreadyFollowing){
       return res.status(200).json({
@@ -90,8 +90,8 @@ const follow = async (req, res) => {
     const followingUser = await User.findOne().where({_id: req.params.id}).exec();
 
     const newUserFollowing = new UserFollowing({
-      user_id: req.user._id,
-      following_user_id: followingUser._id,
+      user: req.user._id,
+      following_user: followingUser._id,
     });
     await newUserFollowing.save();
 
@@ -114,7 +114,7 @@ const unfollow = async (req, res) => {
 
   try {
 
-    const removedFollowings = await UserFollowing.deleteMany().where({user_id: req.user._id}).where({following_user_id: req.params.id}).exec();
+    const removedFollowings = await UserFollowing.deleteMany().where({user: req.user._id}).where({following_user: req.params.id}).exec();
 
     return res.status(200).json({
       message: 'Removed following for this user.'
