@@ -11,8 +11,8 @@ const run = async () => {
     await Promise.all(allUsers.map(async (userToFollow, index) => {
       if( Math.random() < 50/100 ) {
         await new UserFollowing({
-          user: user,
-          following_user: userToFollow
+          user_id: user,
+          following_user_id: userToFollow
         }).save();
       }
     }));

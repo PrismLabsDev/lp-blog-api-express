@@ -1,5 +1,6 @@
 const Joi = require('joi');
 
+const User = require('../models/User');
 const Article = require('../models/Article');
 const Comment = require('../models/Comment');
 const ArticleLike = require('../models/ArticleLike');
@@ -17,7 +18,21 @@ const index = async (req, res) => {
       articleQuery.where('body').regex(new RegExp(req.query.body, 'i'));
     }
 
-    const articles = await articleQuery.exec();
+    if(req.query.user){
+      articleQuery.where({user_id: req.query.user});
+    }
+
+    let articles = await articleQuery.exec();
+
+    articles = await Promise.all(articles.map(async (article) => {
+      let articleObject = article.toObject();
+      articleObject.article_count = await ArticleLike.find().where({article_id: article._id}).count();
+      articleObject.comment_count = await Comment.find().where({article_id: article._id}).where({comment_id: null}).count();
+      articleObject.liked = await ArticleLike.find().where({article_id: article._id}).where({user: req.user._id}).count() > 0;
+      articleObject.user = await User.findOne().where({_id: article.user_id});
+      articleObject.comments = await Comment.find().where({article_id: article._id}).where({comment_id: null}).exec();
+      return articleObject;
+    }));
 
     return res.status(200).json({
       message: 'List of all matching articles.',
@@ -35,9 +50,16 @@ const show = async (req, res) => {
   try {
     const article = await Article.findOne().where({slug: req.params.slug}).exec();
 
+    let articleObject = article.toObject();
+    articleObject.article_count = await ArticleLike.find().where({article_id: article._id}).count();
+    articleObject.comment_count = await Comment.find().where({article_id: article._id}).where({comment_id: null}).count();
+    articleObject.liked = await ArticleLike.find().where({article_id: article._id}).where({user_id: req.user._id}).count() > 0;
+    articleObject.user = await User.findOne().where({_id: article.user_id});
+    articleObject.comments = await Comment.find().where({article_id: article._id}).where({comment_id: null}).exec();
+
     return res.status(200).json({
       message: 'Show article.',
-      article: article
+      article: articleObject
     });
   } catch (error) {
     console.error(error);
@@ -58,7 +80,7 @@ const create = async (req, res) => {
     const formattedSlugFromTitle = req.body.title.replaceAll(" ", "_").replace(/[^\w\s\d]+/gi, '-').toLowerCase();
 
     const newArticle = new Article({
-      user: req.user._id,
+      user_id: req.user._id,
       slug: formattedSlugFromTitle,
       title: req.body.title,
       body: req.body.body,
@@ -152,9 +174,9 @@ const comment = async (req, res) => {
     const article = await Article.findOne().where({slug: req.params.slug}).exec();
 
     const newArticleComment = new Comment({
-      user: req.user._id,
-      article: article._id,
-      comment: null,
+      user_id: req.user._id,
+      article_id: article._id,
+      comment_id: null,
       body: req.body.body,
     });
     await newArticleComment.save();
@@ -176,7 +198,7 @@ const like = async (req, res) => {
   try {
 
     const article = await Article.findOne().where({slug: req.params.slug}).exec();
-    const alreadyLiked = await ArticleLike.findOne().where({user: req.user._id}).where({article: article._id}).exec();
+    const alreadyLiked = await ArticleLike.findOne().where({user_id: req.user._id}).where({article_id: article._id}).exec();
 
     if(alreadyLiked){
       return res.status(200).json({
@@ -185,8 +207,8 @@ const like = async (req, res) => {
     }
 
     const newArticleLike = new ArticleLike({
-      user: req.user._id,
-      article: article._id,
+      user_id: req.user._id,
+      article_id: article._id,
     });
     await newArticleLike.save();
 
@@ -206,7 +228,7 @@ const unlike = async (req, res) => {
   try {
 
     const article = await Article.findOne().where({slug: req.params.slug}).exec();
-    const removedLikes = await ArticleLike.deleteMany().where({user: req.user._id}).where({article: article.id}).exec();
+    const removedLikes = await ArticleLike.deleteMany().where({user_id: req.user._id}).where({article_id: article.id}).exec();
 
     return res.status(200).json({
       message: 'Removed article like.'

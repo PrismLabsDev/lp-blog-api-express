@@ -1,6 +1,8 @@
 const Joi = require('joi');
 
 const User = require('../models/User');
+const Article = require('../models/Article');
+const Comment = require('../models/Comment');
 const UserFollowing = require('../models/UserFollowing');
 
 const index = async (req, res) => {
@@ -16,7 +18,14 @@ const index = async (req, res) => {
       userQuery.where('bio').regex(new RegExp(req.query.username, 'i'));
     }
 
-    const users = await userQuery.exec();
+    let users = await userQuery.exec();
+
+    // Get counts
+    users = await Promise.all(users.map(async (user) => {
+      let userObject = user.toObject();
+      userObject.article_count = await Article.find().where({user_id: user._id}).count();
+      return userObject;
+    }));
 
     return res.status(200).json({
       message: 'Get list of users.',
@@ -35,9 +44,13 @@ const show = async (req, res) => {
 
     const user = await User.findOne().where({_id: req.params.id}).exec();
 
+    let userObject = user.toObject();
+    userObject.articles = await Article.find().where({user_id: user._id}).exec();
+    userObject.article_count = await Article.find().where({user_id: user._id}).count();
+
     return res.status(200).json({
       message: 'Get user.',
-      user: user
+      user: userObject
     });
   } catch (error) {
     console.error(error);
@@ -79,7 +92,7 @@ const update = async (req, res) => {
 const follow = async (req, res) => {
 
   try {
-    const alreadyFollowing = await UserFollowing.findOne().where({user: req.user._id}).where({following_user: req.params.id}).exec();
+    const alreadyFollowing = await UserFollowing.findOne().where({user_id: req.user._id}).where({following_user_id: req.params.id}).exec();
 
     if(alreadyFollowing){
       return res.status(200).json({
@@ -90,8 +103,8 @@ const follow = async (req, res) => {
     const followingUser = await User.findOne().where({_id: req.params.id}).exec();
 
     const newUserFollowing = new UserFollowing({
-      user: req.user._id,
-      following_user: followingUser._id,
+      user_id: req.user._id,
+      following_user_id: followingUser._id,
     });
     await newUserFollowing.save();
 
@@ -114,7 +127,7 @@ const unfollow = async (req, res) => {
 
   try {
 
-    const removedFollowings = await UserFollowing.deleteMany().where({user: req.user._id}).where({following_user: req.params.id}).exec();
+    const removedFollowings = await UserFollowing.deleteMany().where({user_id: req.user._id}).where({following_user_id: req.params.id}).exec();
 
     return res.status(200).json({
       message: 'Removed following for this user.'

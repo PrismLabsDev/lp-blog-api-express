@@ -29,7 +29,7 @@ const register = async (req, res) => {
     const emailVerificationString = crypto.randomBytes(16).toString('hex');
 
     const newUserVerification = new UserVerification({
-      user: newUser,
+      user_id: newUser,
       type: 'email',
       token: emailVerificationString,
     });
@@ -67,7 +67,7 @@ const registerVerification = async (req, res) => {
     }).validateAsync(req.body);
 
     const user = await User.findOne({email: req.body.email});
-    const verification = await UserVerification.findOne({user: user, type: 'email'});
+    const verification = await UserVerification.findOne({user_id: user, type: 'email'});
 
     if(req.body.token != verification.token){
       const emailVerificationString = crypto.randomBytes(16).toString('hex');
@@ -145,7 +145,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ user: user._id }, process.env.AUTH_TOKEN);
+    const token = jwt.sign({ user: user.toObject() }, process.env.AUTH_TOKEN);
 
     await UserVerification.deleteMany({ user: user, type: 'password' });
 

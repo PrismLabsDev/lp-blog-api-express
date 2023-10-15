@@ -16,8 +16,8 @@ const run = async () => {
     await Promise.all(allArticles.map(async (article, index) => {
       if( Math.random() < 50/100 ) {
         await new ArticleLike({
-          user: user,
-          article: article
+          user_id: user,
+          article_id: article
         }).save();
       }
     }));
@@ -25,8 +25,8 @@ const run = async () => {
     await Promise.all(allComments.map(async (comment, index) => {
       if( Math.random() < 50/100 ) {
         await new CommentLike({
-          user: user,
-          comment: comment
+          user_id: user,
+          comment_id: comment
         }).save();
       }
     }));

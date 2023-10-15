@@ -26,7 +26,7 @@ const auth = async (req, res, next) => {
 		});
   }
 
-  const user = await User.findById(decoded.user);
+  const user = await User.findById(decoded.user._id);
 
   if(!user.verified){
     return res.status(401).json({

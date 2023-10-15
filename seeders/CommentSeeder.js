@@ -15,9 +15,9 @@ const run = async () => {
       const randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
 
       await new Comment({
-        user: randomUser,
-        article: article,
-        comment: null,
+        user_id: randomUser,
+        article_id: article,
+        comment_id: null,
         body: faker.lorem.words(10),
       }).save();
     }));
@@ -33,9 +33,9 @@ const run = async () => {
       const randomUser = allUsers[Math.floor(Math.random() * allUsers.length)];
 
       await new Comment({
-        user: randomUser,
-        article: comment.article,
-        comment: comment,
+        user_id: randomUser,
+        article_id: comment.article_id,
+        comment_id: comment,
         body: faker.lorem.words(10),
       }).save();
     }));

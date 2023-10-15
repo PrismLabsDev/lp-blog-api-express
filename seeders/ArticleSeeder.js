@@ -14,7 +14,7 @@ const run = async () => {
       const slug = title.replaceAll(" ", "_").toLowerCase();
 
       await new Article({
-        user: user,
+        user_id: user,
         slug: slug,
         title: title,
         body: faker.lorem.paragraphs(10),
