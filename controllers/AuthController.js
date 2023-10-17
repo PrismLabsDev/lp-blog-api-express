@@ -145,7 +145,7 @@ const login = async (req, res) => {
       });
     }
 
-    const token = jwt.sign({ user: user.toObject() }, process.env.AUTH_TOKEN);
+    const token = jwt.sign({ user: user.toJSON() }, process.env.AUTH_TOKEN);
 
     await UserVerification.deleteMany({ user: user, type: 'password' });
 

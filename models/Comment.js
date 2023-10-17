@@ -5,7 +5,10 @@ const schema = new mongoose.Schema({
   article_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Article', required: true },
   comment_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment' },
   body: { type: String, required: true },
-}, { timestamps: true });
+}, { timestamps: {
+  createdAt: 'created_at', // Use `created_at` to store the created date
+  updatedAt: 'updated_at' // and `updated_at` to store the last updated date
+} });
 
 schema.methods.toJSON = function () {
   const schemaObject = this.toObject();

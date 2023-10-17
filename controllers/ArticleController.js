@@ -25,12 +25,11 @@ const index = async (req, res) => {
     let articles = await articleQuery.exec();
 
     articles = await Promise.all(articles.map(async (article) => {
-      let articleObject = article.toObject();
-      articleObject.article_count = await ArticleLike.find().where({article_id: article._id}).count();
+      let articleObject = article.toJSON();
+      articleObject.like_count = await ArticleLike.find().where({article_id: article._id}).count();
       articleObject.comment_count = await Comment.find().where({article_id: article._id}).where({comment_id: null}).count();
       articleObject.liked = await ArticleLike.find().where({article_id: article._id}).where({user: req.user._id}).count() > 0;
       articleObject.user = await User.findOne().where({_id: article.user_id});
-      articleObject.comments = await Comment.find().where({article_id: article._id}).where({comment_id: null}).exec();
       return articleObject;
     }));
 
@@ -50,8 +49,8 @@ const show = async (req, res) => {
   try {
     const article = await Article.findOne().where({slug: req.params.slug}).exec();
 
-    let articleObject = article.toObject();
-    articleObject.article_count = await ArticleLike.find().where({article_id: article._id}).count();
+    let articleObject = article.toJSON();
+    articleObject.like_count = await ArticleLike.find().where({article_id: article._id}).count();
     articleObject.comment_count = await Comment.find().where({article_id: article._id}).where({comment_id: null}).count();
     articleObject.liked = await ArticleLike.find().where({article_id: article._id}).where({user_id: req.user._id}).count() > 0;
     articleObject.user = await User.findOne().where({_id: article.user_id});

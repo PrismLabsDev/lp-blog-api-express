@@ -1,11 +1,10 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const address = require('address');
 const dotenv = require('dotenv');
 
 dotenv.config();
-
-// Global middleware
-const bodyParser = require('body-parser');
 
 // Routes
 const routesWeb = require('./routes/web');
@@ -13,6 +12,11 @@ const routesAPI = require('./routes/api');
 
 const port = process.env.PORT;
 const app = express();
+
+// Cors
+app.use(cors({
+  origin: true,
+}))
 
 // Global Middleware
 app.use(bodyParser.json());

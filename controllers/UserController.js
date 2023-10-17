@@ -22,7 +22,7 @@ const index = async (req, res) => {
 
     // Get counts
     users = await Promise.all(users.map(async (user) => {
-      let userObject = user.toObject();
+      let userObject = user.toJSON();
       userObject.article_count = await Article.find().where({user_id: user._id}).count();
       return userObject;
     }));
@@ -44,7 +44,7 @@ const show = async (req, res) => {
 
     const user = await User.findOne().where({_id: req.params.id}).exec();
 
-    let userObject = user.toObject();
+    let userObject = user.toJSON();
     userObject.articles = await Article.find().where({user_id: user._id}).exec();
     userObject.article_count = await Article.find().where({user_id: user._id}).count();
 

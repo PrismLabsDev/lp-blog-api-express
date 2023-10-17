@@ -5,7 +5,10 @@ const schema = new mongoose.Schema({
   slug: { type: String, required: true },
   title: { type: String, required: true },
   body: { type: String, required: true },
-}, { timestamps: true });
+}, { timestamps: {
+  createdAt: 'created_at', // Use `created_at` to store the created date
+  updatedAt: 'updated_at' // and `updated_at` to store the last updated date
+} });
 
 schema.methods.toJSON = function () {
   const schemaObject = this.toObject();

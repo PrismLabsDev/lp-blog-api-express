@@ -10,13 +10,13 @@ const show = async (req, res) => {
     const comment = await Comment.findOne().where({_id: req.params.id}).exec();
     const childComments = await Comment.find().where({comment_id: comment._id}).exec();
 
-    const responseComment = comment.toObject();
+    const responseComment = comment.toJSON();
     responseComment.user = await User.findOne().where({_id: comment.user_id});
     responseComment.liked = await CommentLike.find().where({comment_id: comment._id}).where({user: req.user._id}).count() > 0;
     responseComment.comments_count = childComments.length;
 
      responseComment.comments = await Promise.all(childComments.map(async (childComment) => {
-      let childCommentObject = childComment.toObject();
+      let childCommentObject = childComment.toJSON();
       childCommentObject.user = await User.findOne().where({_id: childComment.user_id});
       childCommentObject.liked = await CommentLike.find().where({comment_id: childComment._id}).where({user: req.user._id}).count() > 0;
       childCommentObject.comments_count = await Comment.find().where({comment_id: childComment._id}).count();
